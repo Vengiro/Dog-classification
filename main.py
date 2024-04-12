@@ -65,6 +65,13 @@ def main(args):
         xtrain = xtrain[rinds[n_validation:]]
         ytrain = ytrain[rinds[n_validation:]]
         pass
+
+    # Normalize the data, can be disabled with the argument --no_norm
+    if(args.no_norm == False):
+        x_means = ctrain.mean(0,keepdims=True)
+        x_stds = ctrain.stds(0,keepdims=True)
+        xtrain = normalize_fn(xtrain, x_means, x_stds)
+        xtest = normalize_fn(ytrain, x_means, x_stds)
     
     ### WRITE YOUR CODE HERE to do any other data processing
 
@@ -145,6 +152,7 @@ if __name__ == '__main__':
 
 
     # Feel free to add more arguments here if you need!
+    parser.add_argument('--no_norm', type=bool, default=False, help="disable data normalization")
 
     # MS2 arguments
     parser.add_argument('--nn_type', default="cnn", help="which network to use, can be 'Transformer' or 'cnn'")
