@@ -1,2 +1,4 @@
-/src/data
+/src
 /src/__pycache__
+/data
+features.npz
