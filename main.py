@@ -32,6 +32,8 @@ def main(args):
     ##ORIGINAL IMAGE DATASET (MS2)
     elif args.data_type == "original":
         data_dir = os.path.join(args.data_path,'dog-small-64')
+
+        # (2938, 5), (327, 5), (2938,), (327,), (2938, 2), (327, 2)
         xtrain, xtest, ytrain, ytest, ctrain, ctest = load_data(data_dir)
 
     ##TODO: ctrain and ctest are for regression task. (To be used for Linear Regression and KNN)
@@ -44,7 +46,24 @@ def main(args):
 
     # Make a validation set (it can overwrite xtest, ytest)
     if not args.test:
-        ### WRITE YOUR CODE HERE
+        # Arbitrary value for the fraction of the training data used for validation
+        fraction_validation_test = 0.3
+
+        # Split the training data into training and validation for regression task (center_locating)
+        c_num_samples = ctrain.shape[0]
+        rinds = np.random.permutation(c_num_samples)
+        n_validation = int(c_num_samples * fraction_validation_test)
+        ctest = ctrain[rinds[:n_validation]] 
+        ctrain = ctrain[rinds[n_validation:]]
+
+        # Split the training data into training and validation for classification task (breed_identifying)
+        xy_num_samples = xtrain.shape[0]
+        rinds = np.random.permutation(xy_num_samples)
+        n_validation = int(xy_num_samples * fraction_validation_test)
+        xtest = xtrain[rinds[:n_validation]]
+        ytest = ytrain[rinds[:n_validation]] 
+        xtrain = xtrain[rinds[n_validation:]]
+        ytrain = ytrain[rinds[n_validation:]]
         pass
     
     ### WRITE YOUR CODE HERE to do any other data processing
@@ -60,9 +79,16 @@ def main(args):
     # Follow the "DummyClassifier" example for your methods
     if args.method == "dummy_classifier":
         method_obj = DummyClassifier(arg1=1, arg2=2)
-
-    elif ...:  ### WRITE YOUR CODE HERE
+    elif args.method == "linear_regression":  ### WRITE YOUR CODE HERE
         pass
+    elif args.method == "logistic_regression":  ### WRITE YOUR CODE HERE
+        pass
+    elif args.method == "knn":
+        method_obj = KNN(k=args.K, task_kind=args.task)
+    else:
+        raise Exception("Invalid choice of method! Please choose one of the following: dummy_classifier / knn / linear_regression/ logistic_regression / nn (MS2)")
+        
+    
 
 
     ## 4. Train and evaluate the method
