@@ -47,7 +47,7 @@ class KNN(object):
         if self.task_kind == "classification":
             test_labels = np.array([self.__knn_one_classification(one) for one in test_data])
         else:
-            raise NotImplementedError("Only classification is implemented for KNN.")
+            test_labels = np.array([self.__knn_one_regression(one) for one in test_data])
 
         
         return test_labels
@@ -69,6 +69,24 @@ class KNN(object):
 
         # Return the most common label
         return np.argmax(np.bincount(neighbor_labels))
+    
+    def __knn_one_regression(self, one):
+        """Predict the label of a single example using the k-nearest neighbors algorithm.
+
+        Inputs:
+            one: shape (D,)
+        Outputs:
+            best_label_id: integer
+        """
+
+        # Get the indices of the k nearest neighbors
+        nn_indices = self.__find_k_nearest_neighbors(one)
+
+        # Get the labels of the k nearest neighbors
+        neighbor_coords = self.training_labels[nn_indices]
+
+        # Return the average coords of the k nearest neighbors
+        return np.mean(neighbor_coords, axis=0, keepdims=True)
 
     
     def __euclidean_dist(self, one):
