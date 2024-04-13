@@ -68,10 +68,10 @@ def main(args):
 
     # Normalize the data, can be disabled with the argument --no_norm
     if(args.no_norm == False):
-        x_means = ctrain.mean(0,keepdims=True)
-        x_stds = ctrain.stds(0,keepdims=True)
+        x_means = xtrain.mean(0,keepdims=True)
+        x_stds = xtrain.std(0,keepdims=True)
         xtrain = normalize_fn(xtrain, x_means, x_stds)
-        xtest = normalize_fn(ytrain, x_means, x_stds)
+        xtest = normalize_fn(xtest, x_means, x_stds)
     
     ### WRITE YOUR CODE HERE to do any other data processing
 
@@ -91,7 +91,7 @@ def main(args):
     elif args.method == "logistic_regression":  ### WRITE YOUR CODE HERE
         pass
     elif args.method == "knn":
-        method_obj = KNN(k=args.K, task_kind=args.task)
+        method_obj = KNN(k=args.K, task_kind='regression' if args.task == "center_locating" else 'classification')
     else:
         raise Exception("Invalid choice of method! Please choose one of the following: dummy_classifier / knn / linear_regression/ logistic_regression / nn (MS2)")
         
@@ -152,7 +152,7 @@ if __name__ == '__main__':
 
 
     # Feel free to add more arguments here if you need!
-    parser.add_argument('--no_norm', type=bool, default=False, help="disable data normalization")
+    parser.add_argument('--no_norm', action="store_true", help="disable data normalization")
 
     # MS2 arguments
     parser.add_argument('--nn_type', default="cnn", help="which network to use, can be 'Transformer' or 'cnn'")
