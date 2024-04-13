@@ -27,11 +27,11 @@ class KNN(object):
                 pred_labels (np.array): labels of shape (N,)
         """
 
-        ##
-        ###
-        #### YOUR CODE HERE!
-        ###
-        ##
+        self.training_data = training_data
+        self.training_labels = training_labels
+
+        pred_labels = self.predict(training_data)
+
         return pred_labels
 
     def predict(self, test_data):
@@ -43,9 +43,57 @@ class KNN(object):
             Returns:
                 test_labels (np.array): labels of shape (N,)
         """
-        ##
-        ###
-        #### YOUR CODE HERE!
-        ###
-        ##
+
+        if self.task_kind == "classification":
+            test_labels = np.array([self.__knn_one_classification(one) for one in test_data])
+        else:
+            raise NotImplementedError("Only classification is implemented for KNN.")
+
+        
         return test_labels
+    
+    def __knn_one_classification(self, one):
+        """Predict the label of a single example using the k-nearest neighbors algorithm.
+
+        Inputs:
+            one: shape (D,)
+        Outputs:
+            best_label_id: integer
+        """
+
+        # Get the indices of the k nearest neighbors
+        nn_indices = self.__find_k_nearest_neighbors(one)
+
+        # Get the labels of the k nearest neighbors
+        neighbor_labels = self.training_labels[nn_indices]
+
+        # Return the most common label
+        return np.argmax(np.bincount(neighbor_labels))
+
+    
+    def __euclidean_dist(self, one):
+        """Compute the Euclidean distance between a single one
+        vector and all vectors in a the training_data.
+
+        Inputs:
+            example: shape (D,)
+            training_examples: shape (NxD) 
+        Outputs:
+            euclidean distances: shape (N,)
+        """
+        return np.sqrt(((self.training_data - one) ** 2).sum(axis=1))
+    
+    def __find_k_nearest_neighbors(self, one):
+        """ Find the indices of the k nearest neighbors by computing distances.
+
+        Inputs:
+            k: integer
+        Outputs:
+            indices of the k nearest neighbors: shape (k,)
+        """
+
+        # Compute distances
+        distances = self.__euclidean_dist(one) 
+
+        indices = np.argsort(distances)[:self.k]
+        return indices
