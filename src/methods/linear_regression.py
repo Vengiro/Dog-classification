@@ -14,6 +14,7 @@ class LinearRegression(object):
             and call set_arguments function of this class.
         """
         self.lmda = lmda
+        self.task_kind = task_kind
 
     def fit(self, training_data, training_labels):
         """
@@ -24,11 +25,10 @@ class LinearRegression(object):
             Returns:
                 pred_labels (np.array): target of shape (N,regression_target_size)
         """
-        ##
-        ###
-        #### YOUR CODE HERE!
-        ###
-        ##
+        self.training_data = training_data
+        self.training_labels = training_labels
+
+        pred_regression_targets = predict(self, training_data)
 
         return pred_regression_targets
 
@@ -42,10 +42,22 @@ def predict(self, test_data):
             Returns:
                 test_labels (np.array): labels of shape (N,regression_target_size)
         """
-        ##
-        ###
-        #### YOUR CODE HERE!
-        ###
-        ##
+        N = self.training_data.shape[0]
+        D = self.training_data.shape[1]
+        # Add a column of ones to the training data to account for the bias term
+        X = np.hstack((np.ones((N,1)), self.training_data))
+        # Calculate the weights
+        I = np.eye(D+1)
+        # Set the first element of the identity matrix to 0 because we don't want to regularize the bias term
+        I[0,0] = 0
+        # Calculate the weights
+        w = np.linalg.inv(X.T@X + self.lmda*I)@X.T @self.training_labels
+        N = test_data.shape[0]
+        D = test_data.shape[1]
+        # Add a column of ones to the test data
+        X = np.hstack((np.ones((N,1)), test_data))
+        # Calculate the predicted regression targets
+        pred_regression_targets = X@w
+
 
         return pred_regression_targets
