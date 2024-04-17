@@ -45,7 +45,7 @@ def predict(self, test_data):
         N = self.training_data.shape[0]
         D = self.training_data.shape[1]
         # Add a column of ones to the training data to account for the bias term
-        X = np.hstack((np.ones((N,1)), self.training_data))
+        X = append_bias_term(self.training_data)
         # Calculate the weights
         I = np.eye(D+1)
         # Set the first element of the identity matrix to 0 because we don't want to regularize the bias term
@@ -55,7 +55,7 @@ def predict(self, test_data):
         N = test_data.shape[0]
         D = test_data.shape[1]
         # Add a column of ones to the test data
-        X = np.hstack((np.ones((N,1)), test_data))
+        X = append_bias_term(test_data)
         # Calculate the predicted regression targets
         pred_regression_targets = X@w
 
