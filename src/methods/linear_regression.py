@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+from ..utils import append_bias_term
 
 class LinearRegression(object):
     """
@@ -14,7 +15,7 @@ class LinearRegression(object):
             and call set_arguments function of this class.
         """
         self.lmda = lmda
-        self.task_kind = task_kind
+        self.task_kind = "regression"
 
     def fit(self, training_data, training_labels):
         """
@@ -27,37 +28,30 @@ class LinearRegression(object):
         """
         self.training_data = training_data
         self.training_labels = training_labels
-
-        pred_regression_targets = predict(self, training_data)
-
-        return pred_regression_targets
-
-
-def predict(self, test_data):
-        """
-            Runs prediction on the test data.
-            
-            Arguments:
-                test_data (np.array): test data of shape (N,D)
-            Returns:
-                test_labels (np.array): labels of shape (N,regression_target_size)
-        """
-        N = self.training_data.shape[0]
-        D = self.training_data.shape[1]
         # Add a column of ones to the training data to account for the bias term
         X = append_bias_term(self.training_data)
         # Calculate the weights
-        I = np.eye(D+1)
+        I = np.eye(X.shape[1])
         # Set the first element of the identity matrix to 0 because we don't want to regularize the bias term
         I[0,0] = 0
         # Calculate the weights
-        w = np.linalg.inv(X.T@X + self.lmda*I)@X.T @self.training_labels
-        N = test_data.shape[0]
-        D = test_data.shape[1]
-        # Add a column of ones to the test data
-        X = append_bias_term(test_data)
-        # Calculate the predicted regression targets
-        pred_regression_targets = X@w
+        self.w = np.linalg.inv(X.T@X + self.lmda*I)@X.T @self.training_labels
 
 
-        return pred_regression_targets
+    def predict(self, test_data):
+            """
+                Runs prediction on the test data.
+                
+                Arguments:
+                    test_data (np.array): test data of shape (N,D)
+                Returns:
+                    test_labels (np.array): labels of shape (N,regression_target_size)
+            """
+
+            # Add a column of ones to the test data
+            X = append_bias_term(test_data)
+            # Calculate the predicted regression targets
+            pred_regression_targets = X@self.w
+
+
+            return pred_regression_targets

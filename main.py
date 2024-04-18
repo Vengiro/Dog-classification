@@ -87,7 +87,7 @@ def main(args):
     if args.method == "dummy_classifier":
         method_obj = DummyClassifier(arg1=1, arg2=2)
     elif args.method == "linear_regression":  ### WRITE YOUR CODE HERE
-        pass
+        method_obj = LinearRegression(lmda=args.lmda)
     elif args.method == "logistic_regression":  ### WRITE YOUR CODE HERE
         pass
     elif args.method == "knn":
