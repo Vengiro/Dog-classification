@@ -89,7 +89,7 @@ def main(args):
     elif args.method == "linear_regression":  ### WRITE YOUR CODE HERE
         method_obj = LinearRegression(lmda=args.lmda)
     elif args.method == "logistic_regression":  ### WRITE YOUR CODE HERE
-        pass
+        method_obj = LogisticRegression(lr=args.lr, max_iters=args.max_iters)
     elif args.method == "knn":
         method_obj = KNN(k=args.K, task_kind='regression' if args.task == "center_locating" else 'classification')
     else:
