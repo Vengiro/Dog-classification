@@ -163,6 +163,13 @@ def trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest):
         macrof1 = macrof1_fn(preds, ytest)
         print(f"Test set:  accuracy = {acc_test:.3f}% - F1-score = {macrof1:.3f}")
 
+        plt.hist(preds, alpha=0.5, bins=20, label='Predicted', color='blue')
+        plt.gca().set(title='Frequency Histogram', ylabel='Frequency')
+        plt.hist(ytest, alpha=0.5, bins=20, label='True', color='red')
+
+        plt.legend()
+        plt.show()
+
         return np.array([acc_train, acc_test]).reshape(1,2)
     else:
         raise Exception("Invalid choice of task! Only support center_locating and breed_identifying!")
