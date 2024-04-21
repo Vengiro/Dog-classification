@@ -1,7 +1,7 @@
 import argparse
 
 import numpy as np
-
+import time
 from src.data import load_data
 from src.methods.dummy_methods import DummyClassifier
 from src.methods.logistic_regression import LogisticRegression
@@ -87,15 +87,26 @@ def main(args):
     
     results = np.zeros((0,2))
     possible_k = np.arange(1, 50 if args.test_hyperparam else 2)
+    possible_lmda = np.arange(0,700,10)
+    
 
     # Follow the "DummyClassifier" example for your methods
     if args.method == "dummy_classifier":
         method_obj = DummyClassifier(arg1=1, arg2=2)
-    elif args.method == "linear_regression":  ### WRITE YOUR CODE HERE
-        method_obj = LinearRegression(lmda=args.lmda, task_kind=args.task)
+    elif args.method == "linear_regression":
+        possible_hyp = possible_lmda
+        if(args.test_hyperparam):
+            for lmda in possible_lmda:
+                print(f"\n------------- Lambda = {lmda} -------------")
+                method_obj = LinearRegression(lmda=lmda, task_kind=args.task)
+                results = np.append(results, trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest), axis=0)
+        else :
+            method_obj = LinearRegression(lmda=args.lmda, task_kind=args.task)
+        
     elif args.method == "logistic_regression":  ### WRITE YOUR CODE HERE
         method_obj = LogisticRegression(lr=args.lr, max_iters=args.max_iters, task_kind=args.task)
     elif args.method == "knn":
+        possible_hyp = possible_k
         if(args.test_hyperparam):
             for k in possible_k:
                 print(f"\n------------- K = {k} -------------")
@@ -111,22 +122,48 @@ def main(args):
     ## 4. Train and evaluate the method
     if(args.test_hyperparam):
         regression = args.task == "center_locating"
-        plt.plot(possible_k, results[:,0], label='Training')
-        plt.plot(possible_k, results[:,1], label='Test')
+        plt.plot(possible_hyp, results[:,0], label='Training')
+        plt.plot(possible_hyp, results[:,1], label='Test')
 
         # Adding title
-        plt.title('Result of ' +('Center Locating' if regression else 'Breed Identifying') + ' with KNN')
+        plt.title('Result of ' +('Center Locating' if regression else 'Breed Identifying') + ' with ' + args.method + ' method')
 
         # Adding labels
         plt.xlabel('K')
         plt.ylabel('Mean Square Error' if regression else 'Accuracy [%]')
 
         plt.legend()
+        plt.grid()
         plt.show()  
     else:
         trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest)
 
     ### WRITE YOUR CODE HERE if you want to add other outputs, visualization, etc.
+
+    if (args.hyperpar_logistic):
+        it = np.linspace(50, 600, 12)
+        results = np.zeros(0)
+        array = np.array([1e-6, 1e-5, 1e-4, 1e-3, 1e-2, 1e-1])
+        for lr in array:
+            print(f"\n------------- lr = {lr} -------------")
+            for i in range(50, 650, 50):
+                print(f"\n------------- max_iters = {i} -------------")
+                method_obj = LogisticRegression(lr=lr, max_iters=i, task_kind=args.task)
+                results = np.append(results,
+                                    np.mean(trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest)))
+
+            plt.plot(it, results, label='Learning Rate = ' + str(lr))
+            results = np.zeros(0)
+
+        # Adding title
+        plt.title('The best hyperparameters with Logistic Regression')
+
+        # Adding labels
+        plt.xlabel('Number of iterations')
+        plt.ylabel('Mean Square Error' if args.task == "center_locating" else 'Accuracy [%]')
+
+        plt.legend()
+        plt.show()
 
 def trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest):
 
@@ -147,10 +184,11 @@ def trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest):
         return np.array([train_loss, loss]).reshape(1,2)
 
     elif args.task == "breed_identifying":
-
+        s1 = time.time()
         # Fit (:=train) the method on the training data for classification task
         preds_train = method_obj.fit(xtrain, ytrain)
-
+        s2 = time.time()
+        print(f"Training time: {s2 - s1:.2f}s for {args.method}")
         # Predict on unseen data
         preds = method_obj.predict(xtest)
 
@@ -162,13 +200,6 @@ def trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest):
         acc_test = accuracy_fn(preds, ytest)
         macrof1 = macrof1_fn(preds, ytest)
         print(f"Test set:  accuracy = {acc_test:.3f}% - F1-score = {macrof1:.3f}")
-
-        plt.hist(preds, alpha=0.5, bins=20, label='Predicted', color='blue')
-        plt.gca().set(title='Frequency Histogram', ylabel='Frequency')
-        plt.hist(ytest, alpha=0.5, bins=20, label='True', color='red')
-
-        plt.legend()
-        plt.show()
 
         return np.array([acc_train, acc_test]).reshape(1,2)
     else:
@@ -192,6 +223,8 @@ if __name__ == '__main__':
     # Feel free to add more arguments here if you need!
     parser.add_argument('--no_norm', action="store_true", help="disable data normalization")
     parser.add_argument('--test_hyperparam', action="store_true", help="vary hyperparameters and plot a graph of the results")
+
+    parser.add_argument('--hyperpar_logistic', type=bool, default=False, help="array of diff stepsize")
 
     # MS2 arguments
     parser.add_argument('--nn_type', default="cnn", help="which network to use, can be 'Transformer' or 'cnn'")
