@@ -88,11 +88,13 @@ def main(args):
     results = np.zeros((0,2))
     possible_k = np.arange(1, 50 if args.test_hyperparam else 2)
     possible_lmda = np.arange(0,1000,10)
+    
 
     # Follow the "DummyClassifier" example for your methods
     if args.method == "dummy_classifier":
         method_obj = DummyClassifier(arg1=1, arg2=2)
-    elif args.method == "linear_regression":  ### WRITE YOUR CODE HERE
+    elif args.method == "linear_regression":
+        possible_hyp = possible_lmda
         if(args.test_hyperparam):
             for lmda in possible_lmda:
                 print(f"\n------------- Lambda = {lmda} -------------")
@@ -104,6 +106,7 @@ def main(args):
     elif args.method == "logistic_regression":  ### WRITE YOUR CODE HERE
         method_obj = LogisticRegression(lr=args.lr, max_iters=args.max_iters, task_kind=args.task)
     elif args.method == "knn":
+        possible_hyp = possible_k
         if(args.test_hyperparam):
             for k in possible_k:
                 print(f"\n------------- K = {k} -------------")
@@ -119,11 +122,11 @@ def main(args):
     ## 4. Train and evaluate the method
     if(args.test_hyperparam):
         regression = args.task == "center_locating"
-        plt.plot(possible_k, results[:,0], label='Training')
-        plt.plot(possible_k, results[:,1], label='Test')
+        plt.plot(possible_hyp, results[:,0], label='Training')
+        plt.plot(possible_hyp, results[:,1], label='Test')
 
         # Adding title
-        plt.title('Result of ' +('Center Locating' if regression else 'Breed Identifying') + ' with KNN')
+        plt.title('Result of ' +('Center Locating' if regression else 'Breed Identifying') + ' with ' + args.method + ' method')
 
         # Adding labels
         plt.xlabel('K')
