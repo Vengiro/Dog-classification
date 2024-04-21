@@ -87,7 +87,7 @@ def main(args):
     
     results = np.zeros((0,2))
     possible_k = np.arange(1, 50 if args.test_hyperparam else 2)
-    possible_lmda = np.arange(0,1000,10)
+    possible_lmda = np.arange(0,700,10)
     
 
     # Follow the "DummyClassifier" example for your methods
@@ -111,7 +111,7 @@ def main(args):
             for k in possible_k:
                 print(f"\n------------- K = {k} -------------")
                 method_obj = KNN(k=k, task_kind=args.task)
-                #results = np.append(results, trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest), axis=0)
+                results = np.append(results, trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest), axis=0)
         else :
             method_obj = KNN(k=args.K, task_kind=args.task)
     else:
@@ -133,6 +133,7 @@ def main(args):
         plt.ylabel('Mean Square Error' if regression else 'Accuracy [%]')
 
         plt.legend()
+        plt.grid()
         plt.show()  
     else:
         trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest)
