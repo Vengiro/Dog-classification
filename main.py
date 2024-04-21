@@ -87,7 +87,7 @@ def main(args):
     
     results = np.zeros((0,2))
     possible_k = np.arange(1, 50 if args.test_hyperparam else 2)
-    possible_lmda = np.arange(0,700,10)
+    possible_lmda = np.arange(0,1000,10)
     
 
     # Follow the "DummyClassifier" example for your methods
@@ -129,7 +129,7 @@ def main(args):
         plt.title('Result of ' +('Center Locating' if regression else 'Breed Identifying') + ' with ' + args.method + ' method')
 
         # Adding labels
-        plt.xlabel('Hyperparameter Value')
+        plt.xlabel('Hyperparameter Valuer')
         plt.ylabel('Mean Square Error' if regression else 'Accuracy [%]')
 
         plt.legend()
