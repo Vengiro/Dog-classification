@@ -27,14 +27,12 @@ class LinearRegression(object):
             Returns:
                 pred_labels (np.array): target of shape (N,regression_target_size)
         """
-        bias = training_data
+        biased_training_data = training_data
         labels = training_labels
         # Add a column of ones to the training data to account for the bias term
-        X = append_bias_term(bias)
+        X = append_bias_term(biased_training_data)
         # Calculate the weights
         I = np.eye(X.shape[1])
-        # Set the first element of the identity matrix to 0 because we don't want to regularize the bias term
-        I[0,0] = 0
         # Calculate the weights
         self.w = np.linalg.inv(X.T@X + self.lmda*I)@X.T @labels
 
