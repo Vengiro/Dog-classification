@@ -1,6 +1,6 @@
 import numpy as np
 
-from ..utils import get_n_classes, label_to_onehot, onehot_to_label, accuracy_fn
+from ..utils import get_n_classes, label_to_onehot, onehot_to_label, accuracy_fn, append_bias_term
 
 
 class LogisticRegression(object):
@@ -20,7 +20,7 @@ class LogisticRegression(object):
         self.lr = lr
         self.max_iters = max_iters
         self.task_kind = task_kind
-        self.weight = None
+        self._weight = None
 
 
     def fit(self, training_data, training_labels):
@@ -38,13 +38,15 @@ class LogisticRegression(object):
         #### WRITE YOUR CODE HERE!
         ###
         ##
-        D = training_data.shape[1]
+        biased_training_data = training_data
+        biased_training_data = append_bias_term(biased_training_data)
+        D = biased_training_data.shape[1]
         C = get_n_classes(training_labels)
         label_onehot = label_to_onehot(training_labels)
-        self.weight = np.zeros([D, C])
+        self._weight = np.random.normal(0, 0.1, (D, C))
         for i in range(self.max_iters):
-            self.weight -= self.lr * self.__gradient__(training_data, label_onehot, self.weight)
-            pred_labels = self.__predicition__(training_data, self.weight)
+            self._weight -= self.lr * self.__gradient(biased_training_data, label_onehot, self._weight)
+            pred_labels = self.__predicition(biased_training_data, self._weight)
             if accuracy_fn(pred_labels, training_labels) == 100:
                 return pred_labels
         return pred_labels
@@ -63,9 +65,11 @@ class LogisticRegression(object):
         #### WRITE YOUR CODE HERE!
         ###
         ##
-        return self.__predicition__(test_data, self.weight)
+        biased_test_data = test_data
+        biased_test_data = append_bias_term(biased_test_data)
+        return self.__predicition(biased_test_data, self._weight)
 
-    def __softmax__(self, data, w):
+    def __softmax(self, data, w):
         """
         Compute the softmax of the data.
 
@@ -78,7 +82,7 @@ class LogisticRegression(object):
 
         return np.exp(data @ w) / np.sum(np.exp(data @ w), 1)[:, None]
 
-    def __gradient__(self, data, labels, w):
+    def __gradient(self, data, labels, w):
         """
         Compute the gradient of the loss.
 
@@ -89,9 +93,9 @@ class LogisticRegression(object):
         Returns:
             (array): of shape (D,C)
         """
-        return data.T @ (self.__softmax__(data, w) - labels)
+        return data.T @ (self.__softmax(data, w) - labels)
 
-    def __predicition__(self, data, w):
+    def __predicition(self, data, w):
         """
         Compute the predicted labels.
 
@@ -101,7 +105,7 @@ class LogisticRegression(object):
         Returns:
             (array): of shape (N,)
         """
-        return np.argmax(self.__softmax__(data, w), 1)
+        return onehot_to_label(self.__softmax(data, w))
 
 
 
