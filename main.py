@@ -87,12 +87,20 @@ def main(args):
     
     results = np.zeros((0,2))
     possible_k = np.arange(1, 50 if args.test_hyperparam else 2)
+    possible_lmda = np.arange(0,1000,10)
 
     # Follow the "DummyClassifier" example for your methods
     if args.method == "dummy_classifier":
         method_obj = DummyClassifier(arg1=1, arg2=2)
     elif args.method == "linear_regression":  ### WRITE YOUR CODE HERE
-        method_obj = LinearRegression(lmda=args.lmda, task_kind=args.task)
+        if(args.test_hyperparam):
+            for lmda in possible_lmda:
+                print(f"\n------------- Lambda = {lmda} -------------")
+                method_obj = LinearRegression(lmda=lmda, task_kind=args.task)
+                results = np.append(results, trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest), axis=0)
+        else :
+            method_obj = LinearRegression(lmda=args.lmda, task_kind=args.task)
+        
     elif args.method == "logistic_regression":  ### WRITE YOUR CODE HERE
         method_obj = LogisticRegression(lr=args.lr, max_iters=args.max_iters, task_kind=args.task)
     elif args.method == "knn":
@@ -100,7 +108,7 @@ def main(args):
             for k in possible_k:
                 print(f"\n------------- K = {k} -------------")
                 method_obj = KNN(k=k, task_kind=args.task)
-                results = np.append(results, trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest), axis=0)
+                #results = np.append(results, trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest), axis=0)
         else :
             method_obj = KNN(k=args.K, task_kind=args.task)
     else:
