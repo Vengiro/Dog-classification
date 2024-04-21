@@ -9,6 +9,8 @@ from src.methods.linear_regression import LinearRegression
 from src.methods.knn import KNN
 from src.utils import normalize_fn, append_bias_term, accuracy_fn, macrof1_fn, mse_fn
 import os
+import matplotlib.pyplot as plt
+from matplotlib.ticker import MaxNLocator
 np.random.seed(100)
 
 
@@ -82,6 +84,9 @@ def main(args):
     # Use NN (FOR MS2!)
     if args.method == "nn":
         raise NotImplementedError("This will be useful for MS2.")
+    
+    results = np.zeros((0,2))
+    possible_k = np.arange(1, 50 if args.test_hyperparam else 2)
 
     # Follow the "DummyClassifier" example for your methods
     if args.method == "dummy_classifier":
@@ -91,14 +96,39 @@ def main(args):
     elif args.method == "logistic_regression":  ### WRITE YOUR CODE HERE
         method_obj = LogisticRegression(lr=args.lr, max_iters=args.max_iters, task_kind=args.task)
     elif args.method == "knn":
-        method_obj = KNN(k=args.K, task_kind=args.task)
+        if(args.test_hyperparam):
+            for k in possible_k:
+                print(f"\n------------- K = {k} -------------")
+                method_obj = KNN(k=k, task_kind=args.task)
+                results = np.append(results, trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest), axis=0)
+        else :
+            method_obj = KNN(k=args.K, task_kind=args.task)
     else:
         raise Exception("Invalid choice of method! Please choose one of the following: dummy_classifier / knn / linear_regression/ logistic_regression / nn (MS2)")
         
     
 
-
     ## 4. Train and evaluate the method
+    if(args.test_hyperparam):
+        regression = args.task == "center_locating"
+        plt.plot(possible_k, results[:,0], label='Training')
+        plt.plot(possible_k, results[:,1], label='Test')
+
+        # Adding title
+        plt.title('Result of ' +('Center Locating' if regression else 'Breed Identifying') + ' with KNN')
+
+        # Adding labels
+        plt.xlabel('K')
+        plt.ylabel('Mean Square Error' if regression else 'Accuracy [%]')
+
+        plt.legend()
+        plt.show()  
+    else:
+        trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest)
+
+    ### WRITE YOUR CODE HERE if you want to add other outputs, visualization, etc.
+
+def trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest):
 
     if args.task == "center_locating":
         # Fit parameters on training data
@@ -112,7 +142,9 @@ def main(args):
         train_loss = mse_fn(train_pred, ctrain)
         loss = mse_fn(preds, ctest)
 
-        print(f"\nTrain loss = {train_loss:.3f}% - Test loss = {loss:.3f}")
+        print(f"\nTrain loss = {train_loss:.5f} - Test loss = {loss:.5f}")
+
+        return np.array([train_loss, loss]).reshape(1,2)
 
     elif args.task == "breed_identifying":
 
@@ -123,18 +155,17 @@ def main(args):
         preds = method_obj.predict(xtest)
 
         ## Report results: performance on train and valid/test sets
-        acc = accuracy_fn(preds_train, ytrain)
+        acc_train = accuracy_fn(preds_train, ytrain)
         macrof1 = macrof1_fn(preds_train, ytrain)
-        print(f"\nTrain set: accuracy = {acc:.3f}% - F1-score = {macrof1:.6f}")
+        print(f"\nTrain set: accuracy = {acc_train:.3f}% - F1-score = {macrof1:.6f}")
 
-        acc = accuracy_fn(preds, ytest)
+        acc_test = accuracy_fn(preds, ytest)
         macrof1 = macrof1_fn(preds, ytest)
-        print(f"Test set:  accuracy = {acc:.3f}% - F1-score = {macrof1:.6f}")
+        print(f"Test set:  accuracy = {acc_test:.3f}% - F1-score = {macrof1:.3f}")
+
+        return np.array([acc_train, acc_test]).reshape(1,2)
     else:
         raise Exception("Invalid choice of task! Only support center_locating and breed_identifying!")
-
-    ### WRITE YOUR CODE HERE if you want to add other outputs, visualization, etc.
-
 
 if __name__ == '__main__':
     # Definition of the arguments that can be given through the command line (terminal).
@@ -153,6 +184,7 @@ if __name__ == '__main__':
 
     # Feel free to add more arguments here if you need!
     parser.add_argument('--no_norm', action="store_true", help="disable data normalization")
+    parser.add_argument('--test_hyperparam', action="store_true", help="vary hyperparameters and plot a graph of the results")
 
     # MS2 arguments
     parser.add_argument('--nn_type', default="cnn", help="which network to use, can be 'Transformer' or 'cnn'")
