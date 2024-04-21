@@ -188,7 +188,8 @@ def trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest):
         # Fit (:=train) the method on the training data for classification task
         preds_train = method_obj.fit(xtrain, ytrain)
         s2 = time.time()
-        print(f"Training time: {s2 - s1:.2f}s for {args.method}")
+        if(args.time):
+            print(f"Training time: {s2 - s1:.2f}s for {args.method}")
         # Predict on unseen data
         preds = method_obj.predict(xtest)
 
@@ -224,7 +225,8 @@ if __name__ == '__main__':
     parser.add_argument('--no_norm', action="store_true", help="disable data normalization")
     parser.add_argument('--test_hyperparam', action="store_true", help="vary hyperparameters and plot a graph of the results")
 
-    parser.add_argument('--hyperpar_logistic', type=bool, default=False, help="array of diff stepsize")
+    parser.add_argument('--hyperpar_logistic', type=bool, default=False, help="Boolean")
+    parser.add_argument('--time', type=bool, default=False, help="Show time")
 
     # MS2 arguments
     parser.add_argument('--nn_type', default="cnn", help="which network to use, can be 'Transformer' or 'cnn'")
