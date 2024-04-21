@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 from ..utils import append_bias_term
+import matplotlib.pyplot as plt
 
 class LinearRegression(object):
     """
@@ -26,18 +27,14 @@ class LinearRegression(object):
             Returns:
                 pred_labels (np.array): target of shape (N,regression_target_size)
         """
-        self.training_data = training_data
-        self.training_labels = training_labels
+        biased_training_data = training_data
+        labels = training_labels
         # Add a column of ones to the training data to account for the bias term
-        X = append_bias_term(self.training_data)
+        X = append_bias_term(biased_training_data)
         # Calculate the weights
         I = np.eye(X.shape[1])
-        # Set the first element of the identity matrix to 0 because we don't want to regularize the bias term
-        I[0,0] = 0
         # Calculate the weights
-        self.w = np.linalg.inv(X.T@X + self.lmda*I)@X.T @self.training_labels
-
-        return self.predict(training_data)
+        self.w = np.linalg.inv(X.T@X + self.lmda*I)@X.T @labels
 
 
     def predict(self, test_data):
@@ -54,6 +51,6 @@ class LinearRegression(object):
             X = append_bias_term(test_data)
             # Calculate the predicted regression targets
             pred_regression_targets = X@self.w
-
-
+            
+            
             return pred_regression_targets

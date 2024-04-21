@@ -67,6 +67,8 @@ class KNN(object):
         # Get the labels of the k nearest neighbors
         neighbor_labels = self.training_labels[nn_indices]
 
+        print(np.bincount(neighbor_labels))
+
         # Return the most common label
         return np.argmax(np.bincount(neighbor_labels))
     
@@ -114,4 +116,6 @@ class KNN(object):
         distances = self.__euclidean_dist(one) 
 
         indices = np.argsort(distances)[:self.k]
+        #if(distances[np.argsort(distances)[0]]==0):
+            #print(distances[np.argsort(distances)[0]], distances[np.argsort(distances)[1]], distances[np.argsort(distances)[2]])
         return indices
