@@ -129,7 +129,7 @@ def main(args):
         plt.title('Result of ' +('Center Locating' if regression else 'Breed Identifying') + ' with ' + args.method + ' method')
 
         # Adding labels
-        plt.xlabel('Hyperparameter Valuer')
+        plt.xlabel('Hyperparameter Value')
         plt.ylabel('Mean Square Error' if regression else 'Accuracy [%]')
 
         plt.legend()
