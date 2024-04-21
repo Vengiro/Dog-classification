@@ -44,13 +44,12 @@ class KNN(object):
                 test_labels (np.array): labels of shape (N,)
         """
 
-        if self.task_kind == "classification":
+        if self.task_kind == "breed_identifying" or self.task_kind == "classification":
             test_labels = np.array([self.__knn_one_classification(one) for one in test_data])
         else:
             test_labels = np.array([self.__knn_one_regression(one) for one in test_data])
 
-        
-        return np.squeeze(test_labels, axis=1)
+        return test_labels
     
     def __knn_one_classification(self, one):
         """Predict the label of a single example using the k-nearest neighbors algorithm.
@@ -61,13 +60,14 @@ class KNN(object):
             best_label_id: integer
         """
 
+        
         # Get the indices of the k nearest neighbors
         nn_indices = self.__find_k_nearest_neighbors(one)
 
         # Get the labels of the k nearest neighbors
         neighbor_labels = self.training_labels[nn_indices]
+        #print(np.bincount(neighbor_labels))
 
-        print(np.bincount(neighbor_labels))
 
         # Return the most common label
         return np.argmax(np.bincount(neighbor_labels))
@@ -88,7 +88,7 @@ class KNN(object):
         neighbor_coords = self.training_labels[nn_indices]
 
         # Return the average coords of the k nearest neighbors
-        return np.mean(neighbor_coords, axis=0, keepdims=True)
+        return np.mean(neighbor_coords, axis=0, keepdims=False)
 
     
     def __euclidean_dist(self, one):
@@ -117,5 +117,5 @@ class KNN(object):
 
         indices = np.argsort(distances)[:self.k]
         #if(distances[np.argsort(distances)[0]]==0):
-            #print(distances[np.argsort(distances)[0]], distances[np.argsort(distances)[1]], distances[np.argsort(distances)[2]])
+        #    print(distances[np.argsort(distances)[0]], distances[np.argsort(distances)[1]], distances[np.argsort(distances)[2]])
         return indices
