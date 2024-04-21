@@ -149,8 +149,7 @@ def main(args):
             for i in range(50, 650, 50):
                 print(f"\n------------- max_iters = {i} -------------")
                 method_obj = LogisticRegression(lr=lr, max_iters=i, task_kind=args.task)
-                results = np.append(results,
-                                    np.mean(trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest)))
+                results = np.append(results, np.mean(trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest)))
 
             plt.plot(it, results, label='Learning Rate = ' + str(lr))
             results = np.zeros(0)
@@ -189,7 +188,7 @@ def trainAndEvaluate(method_obj, xtrain, xtest, ytrain, ytest, ctrain, ctest):
         preds_train = method_obj.fit(xtrain, ytrain)
         s2 = time.time()
         if(args.time):
-            print(f"Training time: {s2 - s1:.2f}s for {args.method}")
+            print(f"Training time: {s2 - s1:.2f}s for{args.method}")
         # Predict on unseen data
         preds = method_obj.predict(xtest)
 
