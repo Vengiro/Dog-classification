@@ -50,7 +50,7 @@ class KNN(object):
             test_labels = np.array([self.__knn_one_regression(one) for one in test_data])
 
         
-        return test_labels
+        return np.squeeze(test_labels, axis=1)
     
     def __knn_one_classification(self, one):
         """Predict the label of a single example using the k-nearest neighbors algorithm.
