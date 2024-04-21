@@ -87,11 +87,11 @@ def main(args):
     if args.method == "dummy_classifier":
         method_obj = DummyClassifier(arg1=1, arg2=2)
     elif args.method == "linear_regression":  ### WRITE YOUR CODE HERE
-        method_obj = LinearRegression(lmda=args.lmda)
+        method_obj = LinearRegression(lmda=args.lmda, task_kind=args.task)
     elif args.method == "logistic_regression":  ### WRITE YOUR CODE HERE
-        method_obj = LogisticRegression(lr=args.lr, max_iters=args.max_iters)
+        method_obj = LogisticRegression(lr=args.lr, max_iters=args.max_iters, task_kind=args.task)
     elif args.method == "knn":
-        method_obj = KNN(k=args.K, task_kind='regression' if args.task == "center_locating" else 'classification')
+        method_obj = KNN(k=args.K, task_kind=args.task)
     else:
         raise Exception("Invalid choice of method! Please choose one of the following: dummy_classifier / knn / linear_regression/ logistic_regression / nn (MS2)")
         

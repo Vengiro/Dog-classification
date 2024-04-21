@@ -42,11 +42,11 @@ class LogisticRegression(object):
         C = get_n_classes(training_labels)
         label_onehot = label_to_onehot(training_labels)
         self.weight = np.zeros([D, C])
-        for _ in range(self.max_iters):
+        for i in range(self.max_iters):
             self.weight -= self.lr * self.__gradient__(training_data, label_onehot, self.weight)
             pred_labels = self.__predicition__(training_data, self.weight)
             if accuracy_fn(pred_labels, training_labels) == 100:
-                break
+                return pred_labels
         return pred_labels
 
     def predict(self, test_data):
@@ -75,6 +75,7 @@ class LogisticRegression(object):
         Returns:
             (array): of shape (N,C)
         """
+
         return np.exp(data @ w) / np.sum(np.exp(data @ w), 1)[:, None]
 
     def __gradient__(self, data, labels, w):
