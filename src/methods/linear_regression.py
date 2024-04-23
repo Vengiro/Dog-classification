@@ -36,6 +36,8 @@ class LinearRegression(object):
         # Calculate the weights
         self.w = np.linalg.inv(X.T@X + self.lmda*I)@X.T @labels
 
+        return self.predict(training_data)
+
 
     def predict(self, test_data):
             """
