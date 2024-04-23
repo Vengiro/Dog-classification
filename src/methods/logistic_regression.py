@@ -33,11 +33,7 @@ class LogisticRegression(object):
         Returns:
             pred_labels (array): target of shape (N,)
         """
-        ##
-        ###
-        #### WRITE YOUR CODE HERE!
-        ###
-        ##
+
         biased_training_data = training_data
         biased_training_data = append_bias_term(biased_training_data)
         D = biased_training_data.shape[1]
@@ -60,11 +56,7 @@ class LogisticRegression(object):
         Returns:
             pred_labels (array): labels of shape (N,)
         """
-        ##
-        ###
-        #### WRITE YOUR CODE HERE!
-        ###
-        ##
+
         biased_test_data = test_data
         biased_test_data = append_bias_term(biased_test_data)
         return self.__predicition(biased_test_data, self._weight)
